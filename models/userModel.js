@@ -53,6 +53,11 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
+userSchema.pre('save',function(next){
+  if(this.isModified('password')  || this.isNew) return next()
+  this.changePasswordAt = Date.now()-1000
+  next()
+})
 userSchema.methods.correctpassword = async function (
   candidatepassword,
   userpassword
@@ -62,12 +67,12 @@ userSchema.methods.correctpassword = async function (
 
 userSchema.methods.changePasswordAfter = function (JWTTimestamp) {
   if (this.changePasswordAt) {
-    const changePasswordAt = this.changePasswordAt.getTime() / 100;
+    const changePasswordAtTimeStamp = this.changePasswordAt.getTime() / 1000;
 
-    return changePasswordAt < JWTTimestamp;
+    return  JWTTimestamp < changePasswordAtTimeStamp ;// total second  of iat is less than change pasword time that means older token is using by attackers
   }
-
-  return flase;
+ // False means  password not change
+  return false;
 };
 userSchema.methods.createRandomStringForForgotPassword = function () {
   const randomToken = crypto.randomBytes(32).toString('hex');

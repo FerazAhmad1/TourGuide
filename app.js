@@ -11,10 +11,7 @@ app.use(express.static(`${__dirname}/public`));
 
 app.use((req, res, next) => {
   req.reuestTime = new Date().toISOString();
-  console.log(
-    req.headers,
-    'rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr'
-  );
+  
   next();
 });
 // app.get('/', (req, res) => {
@@ -30,7 +27,8 @@ app.use((req, res, next) => {
 // app.get('/api/v1/tours/:id', getTour);
 // app.patch('/api/v1/tours/:id', updateTour);
 // app.delete('/api/v1/tours/:id', deleteTour);
-
+console.log('i am app.js 1')
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/tours', tourRouter);
+console.log('i am app.js 2')
 module.exports = app;
