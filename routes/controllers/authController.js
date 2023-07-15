@@ -1,4 +1,4 @@
-const crypto = require('crypto')
+ const crypto = require('crypto')
 const { promisify } = require('util');
 const sendMail = require('../../utilities/email');
 const User = require('../../models/userModel');
@@ -18,6 +18,7 @@ exports.signUp = async (req, res, next) => {
   });
 
   const token = signToken(newUser._id);
+  newUser.password=undefined
   res.status(201).json({
     status: 'success',
     token,
@@ -34,10 +35,19 @@ exports.login = async function (req, res, next) {
 
     //   1) check email and password is exist
 
-    if (!email || !password) {
+    if (!email||!password || !password.trim() ) {
       throw new Error('please provide email and password');
     }
 
+    console.log('##Check--', !password)
+    //Validate email
+
+    // if (!(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email))) {
+    //   return res.status(400).json({
+    //     status: 'fail',
+    //     message: 'invalid email',
+    //   });
+    // }
     //   2) check user  exist for corresponding email and paassword
 
     const user = await User.findOne({ email }).select('+password');
@@ -53,6 +63,15 @@ exports.login = async function (req, res, next) {
     //  3) if everythink is ok then send json web token to the client
 
     const token = signToken(user._id);
+    const cookieOption = {
+      expires:new Date(Date.now()+process.env.JWT_COOKIE_EXPIRE_IN*24*60*60*1000),
+      // this makes cookie only be send to encripted connection,basically using https
+      httpOnly:true
+
+    }
+
+    if(process.env.NODE_ENV==='production')cookieOption.secure=true
+      res.cookie('jwt',token,cookieOption)
     res.status(200).json({
       status: 'success',
       token,
@@ -250,12 +269,14 @@ exports.updatePassword = async (req,res,next)=>{
     throw new Error ('Invalid user or  password')
   }
    
+  
  // if both password is correct then update the password
 
  user.password = req.body.newpassword
  user.passwordConfirm = req.body.passwordConfirm
   user.save()
   const token = signToken(user._id)
+  
   res.status(200).json({
     staus:"success",
     token

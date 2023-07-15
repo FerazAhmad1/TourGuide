@@ -1,12 +1,36 @@
 const express = require('express');
-
+const helmet = require('helmet')
+const mongoSanitize = require('express-mongo-sanitize')
+const xss = require('xss-clean')
+const hpp = require('hpp')
+const rateLimit = require('express-rate-limit')
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
-const app = express();
 const morgan = require('morgan');
-app.use(express.json());
+
+const app = express();
+
+
+app.use(express.json({limit:"10kb"}));
+
+// Data sanitization against querry injection
+app.use(mongoSanitize())
+
+// Data sanitization against xss (html injection )
+app.use(xss())
+app.use(hpp())
+
+
+// 
+app.use(helmet())
 app.use(morgan('dev'));
 
+const rateLimiter = rateLimit({
+  max:3,
+  windowMs:60*60*1000, // 1 hour
+  message:'TOO MANY REQUEST'
+})
+app.use('/api',rateLimiter)
 app.use(express.static(`${__dirname}/public`));
 
 app.use((req, res, next) => {
