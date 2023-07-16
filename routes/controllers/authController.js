@@ -17,7 +17,7 @@ exports.signUp = async (req, res, next) => {
       passwordConfirm: req.body.passwordConfirm,
       role: req.body.role,
     });
-  
+  console.log(newUser,'gggggggggggggggggggggggggggggggggggggggggg')
     const token = signToken(newUser._id);
     newUser.password=undefined
     res.status(201).json({
