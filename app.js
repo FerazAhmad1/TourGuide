@@ -30,7 +30,7 @@ const rateLimiter = rateLimit({
   windowMs:60*60*1000, // 1 hour
   message:'TOO MANY REQUEST'
 })
-app.use('/api',rateLimiter)
+
 app.use(express.static(`${__dirname}/public`));
 
 app.use((req, res, next) => {
