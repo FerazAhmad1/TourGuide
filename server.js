@@ -14,7 +14,10 @@ mongoose
     
    
   })
-  .catch((err) => console.log(err));
+  .catch((err) =>{
+    console.log(err)
+    return err
+  } );
 const port = 3000;
 app.listen(port, () => {
   console.log(`app runing on port ${port}`);
