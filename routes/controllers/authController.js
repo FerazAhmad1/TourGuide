@@ -33,7 +33,7 @@ exports.signUp = async (req, res, next) => {
     console.log(error)
     res.status(500).json({
       status:'Fail',
-      message:'internal server error'
+      message:error.message
     })
   }
 };
